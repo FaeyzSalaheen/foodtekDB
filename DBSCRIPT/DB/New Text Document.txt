@@ -1,0 +1,757 @@
+USE [master]
+GO
+/****** Object:  Database [foodtek]    Script Date: 4/5/2025 10:19:12 PM ******/
+CREATE DATABASE [foodtek]
+ CONTAINMENT = NONE
+ ON  PRIMARY 
+( NAME = N'foodtek_Data', FILENAME = N'C:\Program Files\Microsoft SQL Server\MSSQL16.SQL2017\MSSQL\DATA\foodtek.mdf' , SIZE = 8192KB , MAXSIZE = UNLIMITED, FILEGROWTH = 1024KB )
+ LOG ON 
+( NAME = N'foodtek_Log', FILENAME = N'C:\Program Files\Microsoft SQL Server\MSSQL16.SQL2017\MSSQL\DATA\foodtek.ldf' , SIZE = 8192KB , MAXSIZE = 2048GB , FILEGROWTH = 10%)
+ WITH CATALOG_COLLATION = DATABASE_DEFAULT, LEDGER = OFF
+GO
+ALTER DATABASE [foodtek] SET COMPATIBILITY_LEVEL = 160
+GO
+IF (1 = FULLTEXTSERVICEPROPERTY('IsFullTextInstalled'))
+begin
+EXEC [foodtek].[dbo].[sp_fulltext_database] @action = 'enable'
+end
+GO
+ALTER DATABASE [foodtek] SET ANSI_NULL_DEFAULT OFF 
+GO
+ALTER DATABASE [foodtek] SET ANSI_NULLS OFF 
+GO
+ALTER DATABASE [foodtek] SET ANSI_PADDING OFF 
+GO
+ALTER DATABASE [foodtek] SET ANSI_WARNINGS OFF 
+GO
+ALTER DATABASE [foodtek] SET ARITHABORT OFF 
+GO
+ALTER DATABASE [foodtek] SET AUTO_CLOSE OFF 
+GO
+ALTER DATABASE [foodtek] SET AUTO_SHRINK OFF 
+GO
+ALTER DATABASE [foodtek] SET AUTO_UPDATE_STATISTICS ON 
+GO
+ALTER DATABASE [foodtek] SET CURSOR_CLOSE_ON_COMMIT OFF 
+GO
+ALTER DATABASE [foodtek] SET CURSOR_DEFAULT  GLOBAL 
+GO
+ALTER DATABASE [foodtek] SET CONCAT_NULL_YIELDS_NULL OFF 
+GO
+ALTER DATABASE [foodtek] SET NUMERIC_ROUNDABORT OFF 
+GO
+ALTER DATABASE [foodtek] SET QUOTED_IDENTIFIER OFF 
+GO
+ALTER DATABASE [foodtek] SET RECURSIVE_TRIGGERS OFF 
+GO
+ALTER DATABASE [foodtek] SET  ENABLE_BROKER 
+GO
+ALTER DATABASE [foodtek] SET AUTO_UPDATE_STATISTICS_ASYNC OFF 
+GO
+ALTER DATABASE [foodtek] SET DATE_CORRELATION_OPTIMIZATION OFF 
+GO
+ALTER DATABASE [foodtek] SET TRUSTWORTHY OFF 
+GO
+ALTER DATABASE [foodtek] SET ALLOW_SNAPSHOT_ISOLATION OFF 
+GO
+ALTER DATABASE [foodtek] SET PARAMETERIZATION SIMPLE 
+GO
+ALTER DATABASE [foodtek] SET READ_COMMITTED_SNAPSHOT OFF 
+GO
+ALTER DATABASE [foodtek] SET HONOR_BROKER_PRIORITY OFF 
+GO
+ALTER DATABASE [foodtek] SET RECOVERY FULL 
+GO
+ALTER DATABASE [foodtek] SET  MULTI_USER 
+GO
+ALTER DATABASE [foodtek] SET PAGE_VERIFY CHECKSUM  
+GO
+ALTER DATABASE [foodtek] SET DB_CHAINING OFF 
+GO
+ALTER DATABASE [foodtek] SET FILESTREAM( NON_TRANSACTED_ACCESS = OFF ) 
+GO
+ALTER DATABASE [foodtek] SET TARGET_RECOVERY_TIME = 60 SECONDS 
+GO
+ALTER DATABASE [foodtek] SET DELAYED_DURABILITY = DISABLED 
+GO
+ALTER DATABASE [foodtek] SET ACCELERATED_DATABASE_RECOVERY = OFF  
+GO
+EXEC sys.sp_db_vardecimal_storage_format N'foodtek', N'ON'
+GO
+ALTER DATABASE [foodtek] SET QUERY_STORE = ON
+GO
+ALTER DATABASE [foodtek] SET QUERY_STORE (OPERATION_MODE = READ_WRITE, CLEANUP_POLICY = (STALE_QUERY_THRESHOLD_DAYS = 30), DATA_FLUSH_INTERVAL_SECONDS = 900, INTERVAL_LENGTH_MINUTES = 60, MAX_STORAGE_SIZE_MB = 1000, QUERY_CAPTURE_MODE = AUTO, SIZE_BASED_CLEANUP_MODE = AUTO, MAX_PLANS_PER_QUERY = 200, WAIT_STATS_CAPTURE_MODE = ON)
+GO
+USE [foodtek]
+GO
+/****** Object:  Table [dbo].[CartItems]    Script Date: 4/5/2025 10:19:12 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[CartItems](
+	[CartItemId] [int] IDENTITY(1,1) NOT NULL,
+	[CartId] [int] NOT NULL,
+	[ItemId] [int] NOT NULL,
+	[Quantity] [int] NOT NULL,
+	[Price] [decimal](10, 2) NOT NULL,
+	[Discount] [decimal](10, 2) NULL,
+	[FinalPrice]  AS ([Quantity]*([Price]-[Discount])) PERSISTED,
+PRIMARY KEY CLUSTERED 
+(
+	[CartItemId] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[Carts]    Script Date: 4/5/2025 10:19:12 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[Carts](
+	[CartId] [int] IDENTITY(1,1) NOT NULL,
+	[ClientId] [int] NOT NULL,
+	[CreatedDate] [datetime] NULL,
+	[LastUpdated] [datetime] NULL,
+	[CartStatus] [varchar](20) NULL,
+	[TotalPrice] [decimal](10, 2) NULL,
+	[PaymentMethod] [varchar](50) NULL,
+	[DeliveryAddress] [text] NULL,
+	[IsActive] [bit] NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[CartId] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[Categories]    Script Date: 4/5/2025 10:19:12 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[Categories](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[NameEN] [nvarchar](255) NOT NULL,
+	[NameAR] [nvarchar](255) NOT NULL,
+	[Image] [nvarchar](255) NOT NULL,
+	[ItemCount] [int] NULL,
+	[CreatedBy] [nvarchar](50) NOT NULL,
+	[CreatedAt] [datetime] NULL,
+	[UpdatedBy] [nvarchar](50) NULL,
+	[UpdatedAt] [datetime] NULL,
+	[IsActive] [bit] NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[Clientdeteiles]    Script Date: 4/5/2025 10:19:12 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[Clientdeteiles](
+	[UserId] [int] NOT NULL,
+	[Rate] [numeric](2, 1) NULL,
+	[OrderCount] [int] NULL,
+	[Status] [nvarchar](20) NOT NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[UserId] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[ClientLocations]    Script Date: 4/5/2025 10:19:12 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[ClientLocations](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[ClientId] [int] NULL,
+	[AddressId] [int] NULL,
+	[AddressName] [nvarchar](100) NOT NULL,
+	[Province] [nvarchar](50) NOT NULL,
+	[Region] [nvarchar](50) NOT NULL,
+	[AddressHint] [nvarchar](255) NULL,
+	[Latitude] [decimal](9, 6) NULL,
+	[Longitude] [decimal](9, 6) NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[DiscountCategories]    Script Date: 4/5/2025 10:19:12 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[DiscountCategories](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[DiscountId] [int] NULL,
+	[CategoryId] [int] NULL,
+	[CreatedBy] [nvarchar](50) NOT NULL,
+	[CreatedAt] [datetime] NULL,
+	[UpdatedBy] [nvarchar](50) NULL,
+	[UpdatedAt] [datetime] NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[DiscountsOffers]    Script Date: 4/5/2025 10:19:12 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[DiscountsOffers](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[TitleEN] [nvarchar](255) NOT NULL,
+	[TitleAR] [nvarchar](255) NOT NULL,
+	[DescriptionEN] [nvarchar](max) NOT NULL,
+	[DescriptionAR] [nvarchar](max) NOT NULL,
+	[StartDate] [date] NOT NULL,
+	[EndDate] [date] NOT NULL,
+	[LimitAmount] [float] NULL,
+	[LimitPersons] [int] NULL,
+	[Code] [nvarchar](50) NOT NULL,
+	[Image] [nvarchar](255) NULL,
+	[DiscountPercentage] [int] NULL,
+	[Status] [nvarchar](50) NULL,
+	[CreatedBy] [nvarchar](50) NOT NULL,
+	[CreatedAt] [datetime] NULL,
+	[UpdatedBy] [nvarchar](50) NULL,
+	[UpdatedAt] [datetime] NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY],
+UNIQUE NONCLUSTERED 
+(
+	[Code] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[Favorites]    Script Date: 4/5/2025 10:19:12 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[Favorites](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[ClientId] [int] NOT NULL,
+	[ItemId] [int] NOT NULL,
+	[CreatedAt] [datetime] NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY],
+ CONSTRAINT [UQ_Client_Item] UNIQUE NONCLUSTERED 
+(
+	[ClientId] ASC,
+	[ItemId] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[Issues]    Script Date: 4/5/2025 10:19:12 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[Issues](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[ClientId] [int] NULL,
+	[Title] [nvarchar](255) NOT NULL,
+	[ClientFullName] [nvarchar](100) NOT NULL,
+	[ClientEmail] [nvarchar](100) NOT NULL,
+	[CreationDate] [datetime] NULL,
+	[Status] [nvarchar](50) NOT NULL,
+	[CreatedBy] [nvarchar](50) NOT NULL,
+	[UpdatedBy] [nvarchar](50) NOT NULL,
+	[UpdatedAt] [datetime] NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[Item]    Script Date: 4/5/2025 10:19:12 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[Item](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[ItemNameEN] [varchar](255) NOT NULL,
+	[ItemNameAR] [varchar](255) NOT NULL,
+	[ItemImage] [varchar](255) NULL,
+	[ItemDescriptionEN] [text] NULL,
+	[ItemDescriptionAR] [text] NULL,
+	[CategoryId] [int] NULL,
+	[Price] [decimal](10, 2) NULL,
+	[IsActive] [bit] NULL,
+	[CreationDate] [datetime] NULL,
+	[UpdatedDate] [datetime] NULL,
+	[CreatedBy] [nvarchar](50) NOT NULL,
+	[UpdatedBy] [nvarchar](50) NOT NULL,
+	[counteAvailable] [int] NOT NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[ItemOption]    Script Date: 4/5/2025 10:19:12 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[ItemOption](
+	[OptionId] [int] IDENTITY(1,1) NOT NULL,
+	[ItemId] [int] NULL,
+	[OptionNameEN] [varchar](255) NOT NULL,
+	[OptionNameAR] [varchar](255) NOT NULL,
+	[Category] [varchar](50) NULL,
+	[IsRequired] [bit] NULL,
+	[CreationDate] [datetime] NULL,
+	[UpdatedDate] [datetime] NULL,
+	[CreatedBy] [nvarchar](50) NOT NULL,
+	[UpdatedBy] [nvarchar](50) NOT NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[OptionId] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[Notifications]    Script Date: 4/5/2025 10:19:12 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[Notifications](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[Title] [nvarchar](200) NOT NULL,
+	[Description] [nvarchar](max) NOT NULL,
+	[Type] [nvarchar](50) NOT NULL,
+	[IsRead] [bit] NULL,
+	[IsActive] [bit] NULL,
+	[CreatedBy] [nvarchar](20) NULL,
+	[CreationDate] [datetime] NULL,
+	[UpdatedBy] [nvarchar](20) NULL,
+	[UpdatedDate] [datetime] NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[OrderItems]    Script Date: 4/5/2025 10:19:12 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[OrderItems](
+	[OrderItemId] [int] IDENTITY(1,1) NOT NULL,
+	[OrderId] [int] NOT NULL,
+	[ItemId] [int] NOT NULL,
+	[Quantity] [int] NOT NULL,
+	[TotalPrice] [decimal](10, 2) NOT NULL,
+	[ItemOptions] [nvarchar](255) NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[OrderItemId] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[Orders]    Script Date: 4/5/2025 10:19:12 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[Orders](
+	[OrderId] [int] IDENTITY(1,1) NOT NULL,
+	[CustomerId] [int] NOT NULL,
+	[OrderStatus] [nvarchar](20) NULL,
+	[AssignedDriverId] [int] NULL,
+	[CancellationReason] [nvarchar](200) NULL,
+	[TotalAmount] [decimal](10, 2) NOT NULL,
+	[PaymentStatus] [nvarchar](20) NULL,
+	[DeliveryDate] [datetime] NULL,
+	[DeliveryAddress] [nvarchar](255) NULL,
+	[OrderDate] [datetime] NULL,
+	[UpdatedDate] [datetime] NULL,
+	[IsActive] [bit] NULL,
+	[CreatedBy] [nvarchar](20) NULL,
+	[CreationDate] [datetime] NULL,
+	[UpdatedBy] [nvarchar](20) NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[OrderId] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[OTPs]    Script Date: 4/5/2025 10:19:12 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[OTPs](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[UserId] [int] NOT NULL,
+	[OTPCode] [varchar](6) NOT NULL,
+	[OTPType] [varchar](20) NOT NULL,
+	[CreatedAt] [datetime] NOT NULL,
+	[ExpiresAt] [datetime] NOT NULL,
+	[IsUsed] [bit] NOT NULL,
+	[Attempts] [int] NOT NULL,
+	[DeviceInfo] [nvarchar](255) NULL,
+	[IPAddress] [nvarchar](50) NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[Ratings]    Script Date: 4/5/2025 10:19:12 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[Ratings](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[OrderId] [int] NOT NULL,
+	[ClientId] [int] NOT NULL,
+	[DriverId] [int] NOT NULL,
+	[Rating] [int] NULL,
+	[Comment] [nvarchar](255) NULL,
+	[CreatedAt] [datetime] NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[Role]    Script Date: 4/5/2025 10:19:12 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[Role](
+	[id] [int] IDENTITY(1,1) NOT NULL,
+	[name] [varchar](50) NOT NULL,
+	[description] [text] NULL,
+	[createdAt] [datetime] NULL,
+	[updatedAt] [datetime] NULL,
+	[Role Name EN] [nvarchar](50) NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY],
+UNIQUE NONCLUSTERED 
+(
+	[name] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[Tickets]    Script Date: 4/5/2025 10:19:12 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[Tickets](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[Title] [nvarchar](200) NOT NULL,
+	[Description] [nvarchar](max) NOT NULL,
+	[Type] [nvarchar](20) NOT NULL,
+	[Status] [nvarchar](20) NULL,
+	[Response] [nvarchar](max) NULL,
+	[ActionType] [nvarchar](20) NULL,
+	[RefundAmount] [decimal](10, 2) NULL,
+	[RefundExpirationDate] [date] NULL,
+	[CreatedBy] [nvarchar](20) NULL,
+	[CreationDate] [datetime] NULL,
+	[UpdatedBy] [nvarchar](20) NULL,
+	[UpdatedDate] [datetime] NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[Users]    Script Date: 4/5/2025 10:19:12 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[Users](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[fullname] [nvarchar](50) NOT NULL,
+	[Username] [nvarchar](50) NOT NULL,
+	[Email] [nvarchar](100) NOT NULL,
+	[PhoneNumber] [varchar](10) NULL,
+	[Password] [nvarchar](512) NOT NULL,
+	[ProfileImage] [nvarchar](255) NULL,
+	[JoinDate] [datetime] NOT NULL,
+	[IsActive] [bit] NOT NULL,
+	[IsSuperAdmin] [bit] NOT NULL,
+	[CreatedBy] [varchar](50) NOT NULL,
+	[CreatedAt] [datetime] NULL,
+	[UpdatedBy] [varchar](50) NOT NULL,
+	[UpdatedAt] [datetime] NOT NULL,
+	[birthdate] [date] NULL,
+	[role] [int] NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY],
+UNIQUE NONCLUSTERED 
+(
+	[Username] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY],
+UNIQUE NONCLUSTERED 
+(
+	[PhoneNumber] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY],
+UNIQUE NONCLUSTERED 
+(
+	[Email] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+SET ANSI_PADDING ON
+GO
+/****** Object:  Index [IX_OTPs_User_Code]    Script Date: 4/5/2025 10:19:12 PM ******/
+CREATE NONCLUSTERED INDEX [IX_OTPs_User_Code] ON [dbo].[OTPs]
+(
+	[UserId] ASC,
+	[OTPCode] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+GO
+ALTER TABLE [dbo].[CartItems] ADD  DEFAULT ((0)) FOR [Discount]
+GO
+ALTER TABLE [dbo].[Carts] ADD  DEFAULT (getdate()) FOR [CreatedDate]
+GO
+ALTER TABLE [dbo].[Carts] ADD  DEFAULT (getdate()) FOR [LastUpdated]
+GO
+ALTER TABLE [dbo].[Carts] ADD  DEFAULT ('Active') FOR [CartStatus]
+GO
+ALTER TABLE [dbo].[Carts] ADD  DEFAULT ((0)) FOR [TotalPrice]
+GO
+ALTER TABLE [dbo].[Carts] ADD  DEFAULT ((1)) FOR [IsActive]
+GO
+ALTER TABLE [dbo].[Categories] ADD  DEFAULT ((0)) FOR [ItemCount]
+GO
+ALTER TABLE [dbo].[Categories] ADD  DEFAULT (getdate()) FOR [CreatedAt]
+GO
+ALTER TABLE [dbo].[Categories] ADD  DEFAULT (getdate()) FOR [UpdatedAt]
+GO
+ALTER TABLE [dbo].[Categories] ADD  DEFAULT ((1)) FOR [IsActive]
+GO
+ALTER TABLE [dbo].[Clientdeteiles] ADD  DEFAULT ((0)) FOR [OrderCount]
+GO
+ALTER TABLE [dbo].[Clientdeteiles] ADD  DEFAULT ('Active') FOR [Status]
+GO
+ALTER TABLE [dbo].[DiscountCategories] ADD  DEFAULT (getdate()) FOR [CreatedAt]
+GO
+ALTER TABLE [dbo].[DiscountCategories] ADD  DEFAULT (getdate()) FOR [UpdatedAt]
+GO
+ALTER TABLE [dbo].[DiscountsOffers] ADD  DEFAULT (getdate()) FOR [CreatedAt]
+GO
+ALTER TABLE [dbo].[DiscountsOffers] ADD  DEFAULT (getdate()) FOR [UpdatedAt]
+GO
+ALTER TABLE [dbo].[Favorites] ADD  DEFAULT (getdate()) FOR [CreatedAt]
+GO
+ALTER TABLE [dbo].[Issues] ADD  DEFAULT (getdate()) FOR [CreationDate]
+GO
+ALTER TABLE [dbo].[Issues] ADD  DEFAULT (getdate()) FOR [UpdatedAt]
+GO
+ALTER TABLE [dbo].[Item] ADD  DEFAULT ((1)) FOR [IsActive]
+GO
+ALTER TABLE [dbo].[Item] ADD  DEFAULT (getdate()) FOR [CreationDate]
+GO
+ALTER TABLE [dbo].[Item] ADD  DEFAULT ((0)) FOR [counteAvailable]
+GO
+ALTER TABLE [dbo].[ItemOption] ADD  DEFAULT ((0)) FOR [IsRequired]
+GO
+ALTER TABLE [dbo].[ItemOption] ADD  DEFAULT (getdate()) FOR [CreationDate]
+GO
+ALTER TABLE [dbo].[Notifications] ADD  DEFAULT ((0)) FOR [IsRead]
+GO
+ALTER TABLE [dbo].[Notifications] ADD  DEFAULT ((1)) FOR [IsActive]
+GO
+ALTER TABLE [dbo].[Notifications] ADD  DEFAULT (getdate()) FOR [CreationDate]
+GO
+ALTER TABLE [dbo].[Orders] ADD  DEFAULT ('New Order') FOR [OrderStatus]
+GO
+ALTER TABLE [dbo].[Orders] ADD  DEFAULT ('Pending') FOR [PaymentStatus]
+GO
+ALTER TABLE [dbo].[Orders] ADD  DEFAULT (getdate()) FOR [OrderDate]
+GO
+ALTER TABLE [dbo].[Orders] ADD  DEFAULT ((1)) FOR [IsActive]
+GO
+ALTER TABLE [dbo].[Orders] ADD  DEFAULT (getdate()) FOR [CreationDate]
+GO
+ALTER TABLE [dbo].[OTPs] ADD  DEFAULT (getdate()) FOR [CreatedAt]
+GO
+ALTER TABLE [dbo].[OTPs] ADD  DEFAULT ((0)) FOR [IsUsed]
+GO
+ALTER TABLE [dbo].[OTPs] ADD  DEFAULT ((0)) FOR [Attempts]
+GO
+ALTER TABLE [dbo].[Ratings] ADD  DEFAULT (getdate()) FOR [CreatedAt]
+GO
+ALTER TABLE [dbo].[Role] ADD  DEFAULT (getdate()) FOR [createdAt]
+GO
+ALTER TABLE [dbo].[Role] ADD  DEFAULT (getdate()) FOR [updatedAt]
+GO
+ALTER TABLE [dbo].[Tickets] ADD  DEFAULT ('Problem') FOR [Type]
+GO
+ALTER TABLE [dbo].[Tickets] ADD  DEFAULT ('Closed') FOR [Status]
+GO
+ALTER TABLE [dbo].[Tickets] ADD  DEFAULT (getdate()) FOR [CreationDate]
+GO
+ALTER TABLE [dbo].[Users] ADD  DEFAULT (getdate()) FOR [JoinDate]
+GO
+ALTER TABLE [dbo].[Users] ADD  DEFAULT ((1)) FOR [IsActive]
+GO
+ALTER TABLE [dbo].[Users] ADD  DEFAULT ((0)) FOR [IsSuperAdmin]
+GO
+ALTER TABLE [dbo].[Users] ADD  DEFAULT (getdate()) FOR [CreatedAt]
+GO
+ALTER TABLE [dbo].[Users] ADD  DEFAULT (getdate()) FOR [UpdatedAt]
+GO
+ALTER TABLE [dbo].[Users] ADD  DEFAULT ((3)) FOR [role]
+GO
+ALTER TABLE [dbo].[CartItems]  WITH NOCHECK ADD FOREIGN KEY([CartId])
+REFERENCES [dbo].[Carts] ([CartId])
+GO
+ALTER TABLE [dbo].[CartItems]  WITH NOCHECK ADD FOREIGN KEY([ItemId])
+REFERENCES [dbo].[Item] ([Id])
+GO
+ALTER TABLE [dbo].[CartItems]  WITH NOCHECK ADD  CONSTRAINT [FK_CartItems_Item] FOREIGN KEY([ItemId])
+REFERENCES [dbo].[Item] ([Id])
+GO
+ALTER TABLE [dbo].[CartItems] CHECK CONSTRAINT [FK_CartItems_Item]
+GO
+ALTER TABLE [dbo].[Carts]  WITH NOCHECK ADD FOREIGN KEY([ClientId])
+REFERENCES [dbo].[Users] ([Id])
+GO
+ALTER TABLE [dbo].[Clientdeteiles]  WITH NOCHECK ADD FOREIGN KEY([UserId])
+REFERENCES [dbo].[Users] ([Id])
+GO
+ALTER TABLE [dbo].[ClientLocations]  WITH NOCHECK ADD FOREIGN KEY([ClientId])
+REFERENCES [dbo].[Users] ([Id])
+GO
+ALTER TABLE [dbo].[DiscountCategories]  WITH NOCHECK ADD FOREIGN KEY([CategoryId])
+REFERENCES [dbo].[Categories] ([Id])
+ON DELETE CASCADE
+GO
+ALTER TABLE [dbo].[DiscountCategories]  WITH NOCHECK ADD FOREIGN KEY([DiscountId])
+REFERENCES [dbo].[DiscountsOffers] ([Id])
+ON DELETE CASCADE
+GO
+ALTER TABLE [dbo].[DiscountCategories]  WITH NOCHECK ADD  CONSTRAINT [FK_DiscountCategories_Categories] FOREIGN KEY([CategoryId])
+REFERENCES [dbo].[Categories] ([Id])
+GO
+ALTER TABLE [dbo].[DiscountCategories] CHECK CONSTRAINT [FK_DiscountCategories_Categories]
+GO
+ALTER TABLE [dbo].[Favorites]  WITH NOCHECK ADD  CONSTRAINT [FK_Favorites_Client] FOREIGN KEY([ClientId])
+REFERENCES [dbo].[Users] ([Id])
+ON DELETE CASCADE
+GO
+ALTER TABLE [dbo].[Favorites] CHECK CONSTRAINT [FK_Favorites_Client]
+GO
+ALTER TABLE [dbo].[Favorites]  WITH NOCHECK ADD  CONSTRAINT [FK_Favorites_Item] FOREIGN KEY([ItemId])
+REFERENCES [dbo].[Item] ([Id])
+ON DELETE CASCADE
+GO
+ALTER TABLE [dbo].[Favorites] CHECK CONSTRAINT [FK_Favorites_Item]
+GO
+ALTER TABLE [dbo].[Issues]  WITH NOCHECK ADD FOREIGN KEY([ClientId])
+REFERENCES [dbo].[Users] ([Id])
+GO
+ALTER TABLE [dbo].[Item]  WITH NOCHECK ADD  CONSTRAINT [FK_Category] FOREIGN KEY([CategoryId])
+REFERENCES [dbo].[Categories] ([Id])
+GO
+ALTER TABLE [dbo].[Item] CHECK CONSTRAINT [FK_Category]
+GO
+ALTER TABLE [dbo].[ItemOption]  WITH NOCHECK ADD  CONSTRAINT [FK_Item] FOREIGN KEY([ItemId])
+REFERENCES [dbo].[Item] ([Id])
+GO
+ALTER TABLE [dbo].[ItemOption] CHECK CONSTRAINT [FK_Item]
+GO
+ALTER TABLE [dbo].[OrderItems]  WITH NOCHECK ADD FOREIGN KEY([OrderId])
+REFERENCES [dbo].[Orders] ([OrderId])
+GO
+ALTER TABLE [dbo].[OrderItems]  WITH NOCHECK ADD  CONSTRAINT [FK_Client_CreatedBy_Admin] FOREIGN KEY([ItemId])
+REFERENCES [dbo].[Item] ([Id])
+GO
+ALTER TABLE [dbo].[OrderItems] CHECK CONSTRAINT [FK_Client_CreatedBy_Admin]
+GO
+ALTER TABLE [dbo].[OTPs]  WITH CHECK ADD  CONSTRAINT [FK_OTPs_Users] FOREIGN KEY([UserId])
+REFERENCES [dbo].[Users] ([Id])
+GO
+ALTER TABLE [dbo].[OTPs] CHECK CONSTRAINT [FK_OTPs_Users]
+GO
+ALTER TABLE [dbo].[Ratings]  WITH NOCHECK ADD FOREIGN KEY([ClientId])
+REFERENCES [dbo].[Users] ([Id])
+GO
+ALTER TABLE [dbo].[Ratings]  WITH NOCHECK ADD FOREIGN KEY([DriverId])
+REFERENCES [dbo].[Users] ([Id])
+GO
+ALTER TABLE [dbo].[Ratings]  WITH NOCHECK ADD FOREIGN KEY([OrderId])
+REFERENCES [dbo].[Orders] ([OrderId])
+GO
+ALTER TABLE [dbo].[Users]  WITH NOCHECK ADD  CONSTRAINT [FK_users_role] FOREIGN KEY([role])
+REFERENCES [dbo].[Role] ([id])
+GO
+ALTER TABLE [dbo].[Users] CHECK CONSTRAINT [FK_users_role]
+GO
+ALTER TABLE [dbo].[Clientdeteiles]  WITH NOCHECK ADD CHECK  (([Status]='Blocked' OR [Status]='Forbidden' OR [Status]='Not Activated Yet' OR [Status]='Active'))
+GO
+ALTER TABLE [dbo].[DiscountsOffers]  WITH NOCHECK ADD CHECK  (([DiscountPercentage]>(0) AND [DiscountPercentage]<=(50)))
+GO
+ALTER TABLE [dbo].[DiscountsOffers]  WITH NOCHECK ADD CHECK  (([LimitAmount]>(0)))
+GO
+ALTER TABLE [dbo].[DiscountsOffers]  WITH NOCHECK ADD CHECK  (([LimitPersons]>(0)))
+GO
+ALTER TABLE [dbo].[DiscountsOffers]  WITH NOCHECK ADD CHECK  (([Status]='Canceled' OR [Status]='Expired' OR [Status]='Active' OR [Status]='New'))
+GO
+ALTER TABLE [dbo].[Issues]  WITH NOCHECK ADD CHECK  (([Status]='Closed' OR [Status]='Waiting for Customer Response' OR [Status]='Pending' OR [Status]='Open'))
+GO
+ALTER TABLE [dbo].[Item]  WITH NOCHECK ADD CHECK  (([Price]>(0)))
+GO
+ALTER TABLE [dbo].[ItemOption]  WITH NOCHECK ADD CHECK  (([Category]='Removed' OR [Category]='Addition' OR [Category]='Flavor'))
+GO
+ALTER TABLE [dbo].[Notifications]  WITH NOCHECK ADD CHECK  (([Type]='New System Action' OR [Type]='New Order' OR [Type]='Support' OR [Type]='Issue'))
+GO
+ALTER TABLE [dbo].[Orders]  WITH NOCHECK ADD CHECK  (([PaymentStatus]='Failed' OR [PaymentStatus]='Paid' OR [PaymentStatus]='Pending'))
+GO
+ALTER TABLE [dbo].[Ratings]  WITH NOCHECK ADD CHECK  (([Rating]>=(1) AND [Rating]<=(5)))
+GO
+ALTER TABLE [dbo].[Tickets]  WITH NOCHECK ADD CHECK  (([ActionType]='Reject' OR [ActionType]='Close and Refund'))
+GO
+ALTER TABLE [dbo].[Tickets]  WITH NOCHECK ADD CHECK  (([status]='Rejected' OR [status]='Closed' OR [status]='Open'))
+GO
+ALTER TABLE [dbo].[Tickets]  WITH NOCHECK ADD CHECK  (([type]='Suggest' OR [type]='problem'))
+GO
+ALTER TABLE [dbo].[Users]  WITH NOCHECK ADD  CONSTRAINT [chk_birthdate] CHECK  (([birthdate]<=dateadd(year,(-16),getdate())))
+GO
+ALTER TABLE [dbo].[Users] CHECK CONSTRAINT [chk_birthdate]
+GO
+ALTER TABLE [dbo].[Users]  WITH NOCHECK ADD  CONSTRAINT [chk_role] CHECK  (([role]=(4) OR [role]=(3) OR [role]=(2) OR [role]=(1)))
+GO
+ALTER TABLE [dbo].[Users] CHECK CONSTRAINT [chk_role]
+GO
+ALTER TABLE [dbo].[Users]  WITH NOCHECK ADD CHECK  (([Email] like '%@gmail.com' OR [Email] like '%@hotmail.com' OR [Email] like '%@outlook.com' OR [Email] like '%@zoho.com'))
+GO
+ALTER TABLE [dbo].[Users]  WITH NOCHECK ADD CHECK  (([PhoneNumber] like '07________'))
+GO
+ALTER TABLE [dbo].[Users]  WITH NOCHECK ADD CHECK  ((NOT [Username] like '%[^A-Za-z]%'))
+GO
+USE [master]
+GO
+ALTER DATABASE [foodtek] SET  READ_WRITE 
+GO

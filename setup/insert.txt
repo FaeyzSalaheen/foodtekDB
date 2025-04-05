@@ -1,0 +1,189 @@
+-- Clear existing data (in correct order to respect foreign keys)
+DELETE FROM [Ratings];
+DELETE FROM [OrderItems];
+DELETE FROM [Orders];
+DELETE FROM [Favorites];
+DELETE FROM [CartItems];
+DELETE FROM [Carts];
+DELETE FROM [ClientLocations];
+DELETE FROM [Clientdeteiles];
+DELETE FROM [Tickets];
+DELETE FROM [Issues];
+DELETE FROM [ItemOption];
+DELETE FROM [Item];
+DELETE FROM [DiscountCategories];
+DELETE FROM [DiscountsOffers];
+DELETE FROM [Categories];
+DELETE FROM [Notifications];
+DELETE FROM [Users];
+DELETE FROM [Role];
+
+-- Insert 4 predefined roles
+INSERT INTO [Role] ([name], [description], [createdAt], [updatedAt], [Role Name EN])
+VALUES 
+('Super Admin', 'Has full access to all system features', GETDATE(), GETDATE(), 'Super Admin'),
+('Admin', 'Can manage most system features except user roles', GETDATE(), GETDATE(), 'Administrator'),
+('Driver', 'Can view and update order delivery status', GETDATE(), GETDATE(), 'Delivery Driver'),
+('Client', 'Standard customer account for ordering food', GETDATE(), GETDATE(), 'Customer');
+
+-- Insert Super Admin
+INSERT INTO [Users] ([fullname], [Username], [Email], [PhoneNumber], [Password], [ProfileImage], [JoinDate], [IsActive], [IsSuperAdmin], [CreatedBy], [CreatedAt], [UpdatedBy], [UpdatedAt], [birthdate], [role])
+VALUES 
+('Omar Al-Farsi', 'omar_admin', 'omar.admin@foodtek.com', '0777123456', '$2a$10$xJwL5v5Jz5U6Z5b5Y5X5eO5X5eO5X5eO5X5eO5X5eO5X5eO5X5eO', 'profiles/omar.jpg', '2023-01-15', 1, 1, 'system', GETDATE(), 'system', GETDATE(), '1985-05-20', 1);
+
+-- Insert Admins
+INSERT INTO [Users] ([fullname], [Username], [Email], [PhoneNumber], [Password], [ProfileImage], [JoinDate], [IsActive], [IsSuperAdmin], [CreatedBy], [CreatedAt], [UpdatedBy], [UpdatedAt], [birthdate], [role])
+VALUES 
+('Sarah Johnson', 'sarah_admin', 'sarah.admin@foodtek.com', '0778234567', '$2a$10$xJwL5v5Jz5U6Z5b5Y5X5eO5X5eO5X5eO5X5eO5X5eO5X5eO5X5eO', 'profiles/sarah.jpg', '2023-02-10', 1, 0, 'omar_admin', GETDATE(), 'omar_admin', GETDATE(), '1990-08-15', 2),
+('Ali Hassan', 'ali_admin', 'ali.admin@foodtek.com', '0779345678', '$2a$10$xJwL5v5Jz5U6Z5b5Y5X5eO5X5eO5X5eO5X5eO5X5eO5X5eO5X5eO', 'profiles/ali.jpg', '2023-03-05', 1, 0, 'omar_admin', GETDATE(), 'omar_admin', GETDATE(), '1988-11-30', 2);
+
+-- Insert Drivers
+INSERT INTO [Users] ([fullname], [Username], [Email], [PhoneNumber], [Password], [ProfileImage], [JoinDate], [IsActive], [IsSuperAdmin], [CreatedBy], [CreatedAt], [UpdatedBy], [UpdatedAt], [birthdate], [role])
+VALUES 
+('Mohammed Ahmed', 'mohammed_driver', 'mohammed.driver@foodtek.com', '0780456789', '$2a$10$xJwL5v5Jz5U6Z5b5Y5X5eO5X5eO5X5eO5X5eO5X5eO5X5eO5X5eO', 'profiles/mohammed.jpg', '2023-04-20', 1, 0, 'sarah_admin', GETDATE(), 'sarah_admin', GETDATE(), '1992-07-12', 3),
+('Youssef Mahmoud', 'youssef_driver', 'youssef.driver@foodtek.com', '0781567890', '$2a$10$xJwL5v5Jz5U6Z5b5Y5X5eO5X5eO5X5eO5X5eO5X5eO5X5eO5X5eO', 'profiles/youssef.jpg', '2023-05-15', 1, 0, 'ali_admin', GETDATE(), 'ali_admin', GETDATE(), '1991-03-25', 3);
+
+-- Insert Clients
+INSERT INTO [Users] ([fullname], [Username], [Email], [PhoneNumber], [Password], [ProfileImage], [JoinDate], [IsActive], [IsSuperAdmin], [CreatedBy], [CreatedAt], [UpdatedBy], [UpdatedAt], [birthdate], [role])
+VALUES 
+('Fatima Al-Mansoori', 'fatima_client', 'fatima@gmail.com', '0782678901', '$2a$10$xJwL5v5Jz5U6Z5b5Y5X5eO5X5eO5X5eO5X5eO5X5eO5X5eO5X5eO', 'profiles/fatima.jpg', '2023-06-01', 1, 0, 'system', GETDATE(), 'system', GETDATE(), '1993-09-18', 4),
+('David Wilson', 'david_client', 'david.wilson@hotmail.com', '0783789012', '$2a$10$xJwL5v5Jz5U6Z5b5Y5X5eO5X5eO5X5eO5X5eO5X5eO5X5eO5X5eO', 'profiles/david.jpg', '2023-06-10', 1, 0, 'system', GETDATE(), 'system', GETDATE(), '1987-12-05', 4),
+('Layla Ibrahim', 'layla_client', 'layla.ibrahim@outlook.com', '0784890123', '$2a$10$xJwL5v5Jz5U6Z5b5Y5X5eO5X5eO5X5eO5X5eO5X5eO5X5eO5X5eO', 'profiles/layla.jpg', '2023-06-15', 1, 0, 'system', GETDATE(), 'system', GETDATE(), '1995-04-22', 4);
+
+-- Insert Client Details
+INSERT INTO [Clientdeteiles] ([UserId], [Rate], [OrderCount], [Status])
+VALUES 
+(4, 0.9, 12, 'Active'),
+(5, 0.8, 7, 'Active'),
+(6, 0.7, 5, 'Active');
+
+-- Insert Client Locations (Amman, Jordan addresses)
+INSERT INTO [ClientLocations] ([ClientId], [AddressId], [AddressName], [Province], [Region], [AddressHint], [Latitude], [Longitude])
+VALUES 
+(4, 1, 'Home', 'Amman', 'Abdoun', 'Near Abdoun Circle, white building', 31.9566, 35.9457),
+(4, 2, 'Work', 'Amman', 'Shmeisani', '5th floor, blue glass building', 31.9697, 35.9044),
+(5, 1, 'Apartment', 'Amman', 'Khalda', 'Behind Safeway supermarket', 31.9665, 35.8679),
+(6, 1, 'Villa', 'Amman', 'Dabouq', 'Next to King''s Academy', 32.0136, 35.8765);
+
+-- Insert Categories (Middle Eastern food categories)
+INSERT INTO [Categories] ([NameEN], [NameAR], [Image], [ItemCount], [CreatedBy], [CreatedAt], [UpdatedBy], [UpdatedAt], [IsActive])
+VALUES 
+('Main Dishes', 'أطباق رئيسية', 'categories/main_dishes.jpg', 0, 'omar_admin', GETDATE(), 'omar_admin', GETDATE(), 1),
+('Appetizers', 'مقبلات', 'categories/appetizers.jpg', 0, 'omar_admin', GETDATE(), 'omar_admin', GETDATE(), 1),
+('Salads', 'سلطات', 'categories/salads.jpg', 0, 'sarah_admin', GETDATE(), 'sarah_admin', GETDATE(), 1),
+('Desserts', 'حلويات', 'categories/desserts.jpg', 0, 'sarah_admin', GETDATE(), 'sarah_admin', GETDATE(), 1),
+('Beverages', 'مشروبات', 'categories/beverages.jpg', 0, 'ali_admin', GETDATE(), 'ali_admin', GETDATE(), 1);
+
+-- Insert Items (Middle Eastern food items)
+INSERT INTO [Item] ([ItemNameEN], [ItemNameAR], [ItemImage], [ItemDescriptionEN], [ItemDescriptionAR], [CategoryId], [Price], [IsActive], [CreationDate], [UpdatedDate], [CreatedBy], [UpdatedBy], [counteAvailable])
+VALUES 
+('Mansaf', 'منسف', 'items/mansaf.jpg', 'Jordan''s national dish with lamb, rice, and jameed yogurt', 'الطبق الوطني الأردني مع لحم الضأن والأرز والجميد', 1, 12.99, 1, GETDATE(), GETDATE(), 'omar_admin', 'omar_admin', 50),
+('Falafel', 'فلافل', 'items/falafel.jpg', 'Deep-fried chickpea balls, crispy outside and soft inside', 'كرات الفلافل المقلية، مقرمشة من الخارج وطرية من الداخل', 2, 3.50, 1, GETDATE(), GETDATE(), 'sarah_admin', 'sarah_admin', 100),
+('Fattoush', 'فتوش', 'items/fattoush.jpg', 'Levantine bread salad with mixed greens and fried pita', 'سلطة فتوش مع الخضار المختلطة وخبز البيتا المقلي', 3, 5.99, 1, GETDATE(), GETDATE(), 'ali_admin', 'ali_admin', 75),
+('Kunafa', 'كنافة', 'items/kunafa.jpg', 'Sweet cheese pastry soaked in sugar syrup', 'حلوة الكنافة بالجبنة المشبعة بقطر السكر', 4, 7.50, 1, GETDATE(), GETDATE(), 'omar_admin', 'omar_admin', 40),
+('Ayran', 'عيران', 'items/ayran.jpg', 'Refreshing yogurt drink with salt', 'شراب اللبن الزبادي المنعش مع الملح', 5, 1.99, 1, GETDATE(), GETDATE(), 'sarah_admin', 'sarah_admin', 120),
+('Shish Tawook', 'شيش طاووق', 'items/shish_tawook.jpg', 'Grilled chicken skewers with garlic sauce', 'أسياخ الدجاج المشوية مع صلصة الثوم', 1, 10.99, 1, GETDATE(), GETDATE(), 'ali_admin', 'ali_admin', 60),
+('Hummus', 'حمص', 'items/hummus.jpg', 'Creamy chickpea dip with tahini and lemon', 'صوص الحمص الكريمي مع الطحينة والليمون', 2, 4.50, 1, GETDATE(), GETDATE(), 'omar_admin', 'omar_admin', 90),
+('Tabouleh', 'تبولة', 'items/tabouleh.jpg', 'Fresh parsley salad with bulgur and tomatoes', 'سلطة البقدونس الطازجة مع البرغل والطماطم', 3, 5.50, 1, GETDATE(), GETDATE(), 'sarah_admin', 'sarah_admin', 65);
+
+-- Update category item counts
+UPDATE [Categories] SET [ItemCount] = 2 WHERE [Id] = 1;
+UPDATE [Categories] SET [ItemCount] = 2 WHERE [Id] = 2;
+UPDATE [Categories] SET [ItemCount] = 2 WHERE [Id] = 3;
+UPDATE [Categories] SET [ItemCount] = 1 WHERE [Id] = 4;
+UPDATE [Categories] SET [ItemCount] = 1 WHERE [Id] = 5;
+
+-- Insert Item Options
+INSERT INTO [ItemOption] ([ItemId], [OptionNameEN], [OptionNameAR], [Category], [IsRequired], [CreationDate], [UpdatedDate], [CreatedBy], [UpdatedBy])
+VALUES 
+(1, 'Spicy Level', 'مستوى البهارات', 'Flavor', 0, GETDATE(), GETDATE(), 'omar_admin', 'omar_admin'),
+(1, 'Extra Jameed', 'جميد إضافي', 'Addition', 0, GETDATE(), GETDATE(), 'omar_admin', 'omar_admin'),
+(2, 'Extra Tahini', 'طحينة إضافية', 'Addition', 0, GETDATE(), GETDATE(), 'sarah_admin', 'sarah_admin'),
+(3, 'No Onions', 'بدون بصل', 'Removed', 0, GETDATE(), GETDATE(), 'ali_admin', 'ali_admin'),
+(4, 'With Pistachio', 'مع الفستق', 'Addition', 0, GETDATE(), GETDATE(), 'omar_admin', 'omar_admin'),
+(5, 'Less Salt', 'ملح أقل', 'Flavor', 0, GETDATE(), GETDATE(), 'sarah_admin', 'sarah_admin'),
+(6, 'Garlic Sauce', 'صلصة ثوم', 'Addition', 1, GETDATE(), GETDATE(), 'ali_admin', 'ali_admin'),
+(7, 'Extra Olive Oil', 'زيت زيتون إضافي', 'Addition', 0, GETDATE(), GETDATE(), 'omar_admin', 'omar_admin');
+
+-- Insert Discounts/Offers
+INSERT INTO [DiscountsOffers] ([TitleEN], [TitleAR], [DescriptionEN], [DescriptionAR], [StartDate], [EndDate], [LimitAmount], [LimitPersons], [Code], [Image], [DiscountPercentage], [Status], [CreatedBy], [CreatedAt], [UpdatedBy], [UpdatedAt])
+VALUES 
+('Ramadan Special', 'عرض رمضان', '20% off all main dishes during Ramadan', 'خصم 20% على جميع الأطباق الرئيسية خلال رمضان', '2023-03-22', '2023-04-21', 500, 100, 'RAMADAN20', 'offers/ramadan.jpg', 20, 'Active', 'omar_admin', GETDATE(), 'omar_admin', GETDATE()),
+('Weekend Desserts', 'حلويات نهاية الأسبوع', '15% off all desserts every weekend', 'خصم 15% على جميع الحلويات كل نهاية أسبوع', '2023-01-01', '2023-12-31', 300, NULL, 'SWEETWEEKEND', 'offers/desserts.jpg', 15, 'Active', 'sarah_admin', GETDATE(), 'sarah_admin', GETDATE()),
+('New User Offer', 'عرض الأعضاء الجدد', '10% off first order for new users', 'خصم 10% على أول طلب للأعضاء الجدد', '2023-01-01', '2023-12-31', NULL, 500, 'WELCOME10', 'offers/welcome.jpg', 10, 'Active', 'ali_admin', GETDATE(), 'ali_admin', GETDATE());
+
+-- Insert Discount Categories
+INSERT INTO [DiscountCategories] ([DiscountId], [CategoryId], [CreatedBy], [CreatedAt], [UpdatedBy], [UpdatedAt])
+VALUES 
+(1, 1, 'omar_admin', GETDATE(), 'omar_admin', GETDATE()),
+(2, 4, 'sarah_admin', GETDATE(), 'sarah_admin', GETDATE());
+
+-- Insert Carts
+INSERT INTO [Carts] ([ClientId], [CreatedDate], [LastUpdated], [CartStatus], [TotalPrice], [PaymentMethod], [DeliveryAddress], [IsActive])
+VALUES 
+(4, '2023-06-20 18:30:00', '2023-06-20 18:45:00', 'Active', 23.48, 'Credit Card', 'Near Abdoun Circle, white building', 1),
+(5, '2023-06-21 12:15:00', '2023-06-21 12:30:00', 'Active', 15.99, 'Cash', '5th floor, blue glass building', 1),
+(6, '2023-06-22 19:00:00', '2023-06-22 19:20:00', 'Abandoned', 32.97, NULL, 'Next to King''s Academy', 0);
+
+-- Insert Cart Items
+INSERT INTO [CartItems] ([CartId], [ItemId], [Quantity], [Price], [Discount])
+VALUES 
+(1, 1, 1, 12.99, 0),
+(1, 3, 1, 5.99, 0),
+(1, 5, 2, 1.99, 0.50),
+(2, 2, 3, 3.50, 0),
+(2, 7, 1, 4.50, 0),
+(3, 1, 2, 12.99, 2.00),
+(3, 4, 1, 7.50, 0);
+
+-- Insert Favorites
+INSERT INTO [Favorites] ([ClientId], [ItemId], [CreatedAt])
+VALUES 
+(4, 1, '2023-06-05'),
+(4, 3, '2023-06-10'),
+(5, 2, '2023-06-12'),
+(5, 7, '2023-06-15'),
+(6, 4, '2023-06-18');
+
+-- Insert Orders
+INSERT INTO [Orders] ([CustomerId], [OrderStatus], [AssignedDriverId], [CancellationReason], [TotalAmount], [PaymentStatus], [DeliveryDate], [DeliveryAddress], [OrderDate], [UpdatedDate], [IsActive], [CreatedBy], [CreationDate], [UpdatedBy])
+VALUES 
+(4, 'Delivered', 1, NULL, 23.48, 'Paid', '2023-06-20 19:30:00', 'Near Abdoun Circle, white building', '2023-06-20 18:45:00', '2023-06-20 19:35:00', 1, 'system', '2023-06-20 18:45:00', 'system'),
+(5, 'In Progress', 2, NULL, 15.99, 'Paid', NULL, '5th floor, blue glass building', '2023-06-21 12:30:00', '2023-06-21 12:35:00', 1, 'system', '2023-06-21 12:30:00', 'system'),
+(6, 'Cancelled', NULL, 'Changed my mind', 32.97, 'Failed', NULL, 'Next to King''s Academy', '2023-06-22 19:20:00', '2023-06-22 19:25:00', 0, 'system', '2023-06-22 19:20:00', 'system');
+
+-- Insert Order Items
+INSERT INTO [OrderItems] ([OrderId], [ItemId], [Quantity], [TotalPrice], [ItemOptions])
+VALUES 
+(1, 1, 1, 12.99, 'Extra Jameed'),
+(1, 3, 1, 5.99, 'No Onions'),
+(1, 5, 2, 4.48, 'Less Salt'),
+(2, 2, 3, 10.50, 'Extra Tahini'),
+(2, 7, 1, 4.50, 'Extra Olive Oil'),
+(3, 1, 2, 25.98, 'Spicy Level: Medium'),
+(3, 4, 1, 7.50, 'With Pistachio');
+
+-- Insert Ratings
+INSERT INTO [Ratings] ([OrderId], [ClientId], [DriverId], [Rating], [Comment], [CreatedAt])
+VALUES 
+(1, 4, 1, 5, 'Excellent service and delicious food!', '2023-06-20 20:00:00'),
+(2, 5, 2, 4, 'Good but arrived slightly late', '2023-06-21 13:30:00');
+
+-- Insert Notifications
+INSERT INTO [Notifications] ([Title], [Description], [Type], [IsRead], [IsActive], [CreatedBy], [CreationDate], [UpdatedBy], [UpdatedDate])
+VALUES 
+('Order Delivered', 'Your order #1001 has been delivered', 'New Order', 1, 1, 'system', '2023-06-20 19:30:00', 'system', '2023-06-20 19:30:00'),
+('Special Offer', '20% off all main dishes this weekend', 'New System Action', 0, 1, 'omar_admin', '2023-06-21 10:00:00', 'omar_admin', '2023-06-21 10:00:00'),
+('Delivery Update', 'Your order is on the way', 'New Order', 0, 1, 'system', '2023-06-21 12:45:00', 'system', '2023-06-21 12:45:00');
+
+-- Insert Issues
+INSERT INTO [Issues] ([ClientId], [Title], [ClientFullName], [ClientEmail], [CreationDate], [Status], [CreatedBy], [UpdatedBy], [UpdatedAt])
+VALUES 
+(4, 'Missing Item', 'Fatima Al-Mansoori', 'fatima@gmail.com', '2023-06-20 20:15:00', 'Closed', 'system', 'sarah_admin', '2023-06-20 21:00:00'),
+(5, 'Late Delivery', 'David Wilson', 'david.wilson@hotmail.com', '2023-06-21 13:45:00', 'Pending', 'system', 'system', '2023-06-21 13:45:00');
+
+-- Insert Tickets
+INSERT INTO [Tickets] ([Title], [Description], [Type], [Status], [Response], [ActionType], [RefundAmount], [RefundExpirationDate], [CreatedBy], [CreationDate], [UpdatedBy], [UpdatedDate])
+VALUES 
+('Missing Item Complaint', 'My order was missing one falafel sandwich', 'Problem', 'Closed', 'We apologize for the inconvenience. A refund has been processed.', 'Close and Refund', 3.50, '2023-07-20', 'fatima_client', '2023-06-20 20:15:00', 'sarah_admin', '2023-06-20 21:00:00'),
+('Late Delivery Feedback', 'My order arrived 30 minutes late', 'Problem', 'Open', 'We are looking into this issue with our delivery team.', NULL, NULL, NULL, 'david_client', '2023-06-21 13:45:00', 'david_client', '2023-06-21 13:45:00');
